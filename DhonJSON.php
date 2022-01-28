@@ -130,8 +130,8 @@ Class DhonJSON {
 		}
         !$posts[$this->fields[0]] && in_array('stamp', $this->fields) ? $posts['stamp'] = time() : false;
         if ($posts[$this->fields[0]]) {
-            $this->db->update($this->table, $posts);
             $id = $posts[$this->fields[0]];
+            $this->db->update($this->table, $posts, [$this->fields[0] => $id]);
         } else {
             $this->db->insert($this->table, $posts);
             $id = $this->db->insert_id();
