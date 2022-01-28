@@ -128,9 +128,15 @@ Class DhonJSON {
         foreach ($_POST as $key => $value) {
             if (in_array($key, $this->fields)) $posts[$key] = $value;
 		}
-        in_array('stamp', $this->fields) ? $posts['stamp'] = time() : false;
-        $this->db->insert($this->table, $posts);
-        $this->json_response['data'] = $this->db->get_where($this->table, [$this->fields[0] => $this->db->insert_id()])->row_array();
+        !$posts[$this->fields[0]] && in_array('stamp', $this->fields) ? $posts['stamp'] = time() : false;
+        if ($posts[$this->fields[0]]) {
+            $this->db->update($this->table, $posts);
+            $id = $posts[$this->fields[0]];
+        } else {
+            $this->db->insert($this->table, $posts);
+            $id = $this->db->insert_id();
+        }
+        $this->json_response['data'] = $this->db->get_where($this->table, [$this->fields[0] => $id])->row_array();
     }
 
     private function send()
