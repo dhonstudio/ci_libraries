@@ -144,11 +144,7 @@ Class DhonJSON {
 
     private function delete()
     {
-        if ($this->response === 'success') {
-            $this->db->delete($this->table, [$this->fields[0] => $this->id]);
-        }
-
-        $this->send();
+        $this->db->delete($this->table, [$this->fields[0] => $this->id]);
     }
 
     private function send()
