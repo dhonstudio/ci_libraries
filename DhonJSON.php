@@ -63,6 +63,19 @@ Class DhonJSON {
         $this->send();
     }
 
+    public function delete(int $id)
+    {
+        $this->db           = $this->load->database($this->uri->segment(2), TRUE);
+        $this->table        = $this->uri->segment(3);
+        $this->fields       = $this->db->list_fields($this->table);
+
+        if ($this->response === 'success') {
+            $this->db->delete($this->table, [$this->fields[0] => $id]);
+        }
+
+        $this->send();
+    }
+
     private function get()
     {
         $this->db = $this->db->get($this->table);
