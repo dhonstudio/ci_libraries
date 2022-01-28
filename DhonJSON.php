@@ -9,6 +9,7 @@ Class DhonJSON {
     public $table;
     public $fields;
     public $data;
+    public $id;
 
     public function __construct()
 	{
@@ -52,25 +53,14 @@ Class DhonJSON {
         $this->db_total     = $this->load->database($this->uri->segment(2), TRUE);
         $this->db_default   = $this->load->database($this->uri->segment(2), TRUE);
         $this->table        = $this->uri->segment(3);
+        $this->id           = $this->uri->segment(5);
         $this->fields       = $this->db->list_fields($this->table);
 
         if ($this->response === 'success') {
             if ($_GET) $this->get_where();
             else if ($_POST) $this->post();
+            else if ($this->uri->segment(4) == 'delete') $this->delete();
             else $this->get();
-        }
-
-        $this->send();
-    }
-
-    public function delete(int $id)
-    {
-        $this->db           = $this->load->database($this->uri->segment(2), TRUE);
-        $this->table        = $this->uri->segment(3);
-        $this->fields       = $this->db->list_fields($this->table);
-
-        if ($this->response === 'success') {
-            $this->db->delete($this->table, [$this->fields[0] => $id]);
         }
 
         $this->send();
@@ -150,6 +140,15 @@ Class DhonJSON {
             $id = $this->db->insert_id();
         }
         $this->json_response['data'] = $this->db->get_where($this->table, [$this->fields[0] => $id])->row_array();
+    }
+
+    private function delete()
+    {
+        if ($this->response === 'success') {
+            $this->db->delete($this->table, [$this->fields[0] => $this->id]);
+        }
+
+        $this->send();
     }
 
     private function send()
