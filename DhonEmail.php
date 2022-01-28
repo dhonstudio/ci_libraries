@@ -5,6 +5,8 @@ Class DhonEmail {
     public function __construct()
 	{
         $this->dhonemail =& get_instance();
+
+        $this->email = $this->dhonemail->email;
     }
 
     public function message(string $title, string $img_logo, string $fullName, string $message, array $link, string $footer_message, string $author, string $api_wa, string $template = 'w3')
