@@ -48,9 +48,15 @@ Class DhonAPI {
         curl_close($curl);
     }
 
-    public function delete(string $db, string $table, array $column)
-    {
-        # code...
+    public function delete(string $db, string $table, int $id)
+    {        
+        $curl = curl_init();
+        curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+        curl_setopt($curl, CURLOPT_USERPWD, "{$this->username}:{$this->password}");
+        curl_setopt($curl, CURLOPT_URL, "{$this->api_url[ENVIRONMENT]}{$db}/{$table}/delete/{$id}");
+        curl_setopt($curl, CURLOPT_RETURNTRANSFER, TRUE);
+        return json_decode(curl_exec($curl), true)['data'];
+        curl_close($curl);
     }
     
     public function curl(string $url)
