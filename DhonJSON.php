@@ -73,11 +73,11 @@ Class DhonJSON {
     private function get_where()
     {
         foreach ($_GET as $key => $value) {
-            if (strpos($key, '>') !== false) {
-				$get_verified = str_replace(">","",$key);
+            if (strpos($key, '__more') !== false) {
+				$get_verified = str_replace("__more","",$key);
 				if (in_array($get_verified, $this->fields)) $get_where[$get_verified.' >'] = $value;
-			} else if (strpos($key, '<') !== false) {
-				$get_verified = str_replace("<","",$key);
+			} else if (strpos($key, '__less') !== false) {
+				$get_verified = str_replace("__less","",$key);
 				if (in_array($get_verified, $this->fields)) $get_where[$get_verified.' <'] = $value;
 			} else {
                 if (in_array($key, $this->fields)) $get_where[$key] = $value;
