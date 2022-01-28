@@ -49,17 +49,17 @@ Class DhonJSON {
 
     public function collect()
     {
-        $this->db           = $this->load->database($this->uri->segment(2), TRUE);
-        $this->db_total     = $this->load->database($this->uri->segment(2), TRUE);
-        $this->db_default   = $this->load->database($this->uri->segment(2), TRUE);
-        $this->table        = $this->uri->segment(3);
-        $this->id           = $this->uri->segment(5);
+        $this->db           = $this->load->database($this->uri->segment(1), TRUE);
+        $this->db_total     = $this->load->database($this->uri->segment(1), TRUE);
+        $this->db_default   = $this->load->database($this->uri->segment(1), TRUE);
+        $this->table        = $this->uri->segment(2);
+        $this->id           = $this->uri->segment(4);
         $this->fields       = $this->db->list_fields($this->table);
 
         if ($this->response === 'success') {
             if ($_GET) $this->get_where();
             else if ($_POST) $this->post();
-            else if ($this->uri->segment(4) == 'delete') $this->delete();
+            else if ($this->uri->segment(3) == 'delete') $this->delete();
             else $this->get();
         }
 
