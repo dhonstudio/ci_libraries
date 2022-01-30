@@ -19,13 +19,13 @@ Class DhonJSON {
         $this->uri  = $this->dhonjson->uri;
     }
 
-    public function auth()
+    public function auth(string $db_api_name)
     {
         // unset($_SERVER['PHP_AUTH_USER']);
 		if (!isset($_SERVER['PHP_AUTH_USER'])) {
 			$this->unauthorized();
 		} else {
-            $db_api   = $this->load->database('project', TRUE);
+            $db_api   = $this->load->database($db_api_name, TRUE);
 		    $user     = $db_api->get_where('api_users', ['username' => $_SERVER['PHP_AUTH_USER']])->row_array();
 			
             if (password_verify($_SERVER['PHP_AUTH_PW'], $user['password'])) {
