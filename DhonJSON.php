@@ -57,7 +57,8 @@ Class DhonJSON {
         $this->fields       = $this->db->list_fields($this->table);
 
         if ($this->response === 'success') {
-            if ($_GET) $this->get_where();
+            if ($this->uri->segment(3) == 'password_verify') $this->password_verify();
+            else if ($_GET) $this->get_where();
             else if ($_POST) $this->post();
             else if ($this->uri->segment(3) == 'delete') $this->delete();
             else $this->get();
@@ -145,6 +146,22 @@ Class DhonJSON {
     private function delete()
     {
         $this->db->delete($this->table, [$this->fields[0] => $this->id]);
+    }
+
+    public function password_verify()
+    {
+        foreach ($_GET as $key => $value) {
+            if (in_array($key, $this->fields)) {
+                if ($key == 'password' || $key == 'password_hash') {
+                    $password_field_name = $key;
+                } else {
+                    $get_where[$key] = $value;
+                }
+            }
+		}
+        $this->data = $this->db->get_where($this->table, $get_where)->row_array();
+        $result = password_verify($_GET[$password_field_name], $this->data[$password_field_name]) ? true : false;
+        $this->json_response['data'] = $result;
     }
 
     private function send()
