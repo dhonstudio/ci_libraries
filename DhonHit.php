@@ -42,7 +42,6 @@ Class DhonHit {
         $this->get_session();
         $this->get_source();
         $this->get_page();
-        $this->create_hit();
     }
 
     private function get_ip()
@@ -124,7 +123,7 @@ Class DhonHit {
         }
     }
 
-    private function create_hit()
+    public function create_hit()
     {
         if (
             $this->uri->segment(1) != 'assets'
