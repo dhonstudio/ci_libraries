@@ -28,11 +28,6 @@ Class DhonHit {
         require_once __DIR__ . '/../../assets/ci_libraries/DhonAPI.php';
         $this->dhonapi = new DhonAPI;
 
-        $this->dhonapi->api_url['development'] = $this->api_url['development'];
-        $this->dhonapi->api_url['production'] = $this->api_url['production'];
-        $this->dhonapi->username = $this->username;
-        $this->dhonapi->password = $this->password;
-
         $this->load     = $this->dhonhit->load;
         $this->input    = $this->dhonhit->input;
         $this->uri      = $this->dhonhit->uri;
@@ -125,6 +120,11 @@ Class DhonHit {
 
     public function create_hit()
     {
+        $this->dhonapi->api_url['development'] = $this->api_url['development'];
+        $this->dhonapi->api_url['production'] = $this->api_url['production'];
+        $this->dhonapi->username = $this->username;
+        $this->dhonapi->password = $this->password;
+        
         if (
             $this->uri->segment(1) != 'assets'
         ) {
