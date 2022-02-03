@@ -160,7 +160,7 @@ Class DhonJSON {
             }
 		}
         $this->data = $this->db->get_where($this->table, $get_where)->row_array();
-        $result = password_verify($_GET[$password_field_name], $this->data[$password_field_name]) ? true : false;
+        $result = $this->data ? (password_verify($_GET[$password_field_name], $this->data[$password_field_name]) ? true : false) : false;
         $this->json_response['data'] = $result;
     }
 
