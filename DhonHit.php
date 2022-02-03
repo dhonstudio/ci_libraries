@@ -31,12 +31,6 @@ Class DhonHit {
         $this->load     = $this->dhonhit->load;
         $this->input    = $this->dhonhit->input;
         $this->uri      = $this->dhonhit->uri;
-
-        $this->get_ip();
-        $this->get_entity();
-        $this->get_session();
-        $this->get_source();
-        $this->get_page();
     }
 
     private function get_ip()
@@ -124,7 +118,13 @@ Class DhonHit {
         $this->dhonapi->api_url['production'] = $this->api_url['production'];
         $this->dhonapi->username = $this->username;
         $this->dhonapi->password = $this->password;
-        
+
+        $this->get_ip();
+        $this->get_entity();
+        $this->get_session();
+        $this->get_source();
+        $this->get_page();
+
         if (
             $this->uri->segment(1) != 'assets'
         ) {
