@@ -1,6 +1,6 @@
 <?php
 
-Class DhonDB {
+Class DhonMigrate {
     public $version;
     public $table;
     public $constraint;
