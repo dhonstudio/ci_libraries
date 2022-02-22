@@ -10,19 +10,28 @@ Class DhonAuth {
         $this->load = $this->dhonauth->load;
     }
 
-    public function auth(string $db_api_name, $user_from_api = [])
+    public function auth(string $db_api_name = '', $user_from_api = [])
     {
-        $db_api = $this->load->database($db_api_name, TRUE);
+        if ($db_api_name) {
+            $db_api = $this->load->database($db_api_name, TRUE);
+            
+            if ($db_api->table_exists('api_users')) {
+                $user = $db_api->get_where('api_users', ['username' => $_SERVER['PHP_AUTH_USER']])->row_array();
+                $this->authorizing($user);
+            }
+        } else {
+            $user = $user_from_api;
+            $this->authorizing($user);
+        }
+    }
 
-        if ($db_api->table_exists('api_users')) {
-            if (!isset($_SERVER['PHP_AUTH_USER'])) {
+    private function authorizing($user)
+    {
+        if (!isset($_SERVER['PHP_AUTH_USER'])) {
+            $this->unauthorized();
+        } else {            
+            if (!password_verify($_SERVER['PHP_AUTH_PW'], $user['password'])) {
                 $this->unauthorized();
-            } else {
-                $user = !empty($user_from_api) ? $user_from_api : $db_api->get_where('api_users', ['username' => $_SERVER['PHP_AUTH_USER']])->row_array();
-                
-                if (!password_verify($_SERVER['PHP_AUTH_PW'], $user['password'])) {
-                    $this->unauthorized();
-                }
             }
         }
     }
