@@ -107,6 +107,8 @@ Class DhonJSON {
             if (in_array($key, $this->fields)) $posts[$key] = $value;
 		}
         !isset($_POST[$this->fields[0]]) && in_array('stamp', $this->fields) ? $posts['stamp'] = time() : false;
+        !isset($_POST[$this->fields[0]]) && in_array('created_at', $this->fields) ? $posts['created_at'] = time() : 
+        (in_array('modified_at', $this->fields) ? $posts['modified_at'] = time() : false);
         if (isset($_POST[$this->fields[0]])) {
             $id = $posts[$this->fields[0]];
             $this->db->update($this->table, $posts, [$this->fields[0] => $id]);
