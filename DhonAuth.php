@@ -7,7 +7,24 @@ Class DhonAuth {
         $this->dhonjson = new DhonJSON;
     }
 
-    public function unauthorized()
+    public function auth(string $db_api_name)
+    {
+        $db_api = $this->load->database($db_api_name, TRUE);
+
+        if ($db_api->table_exists('api_users')) {
+            if (!isset($_SERVER['PHP_AUTH_USER'])) {
+                $this->unauthorized();
+            } else {
+                $user = $db_api->get_where('api_users', ['username' => $_SERVER['PHP_AUTH_USER']])->row_array();
+                
+                if (!password_verify($_SERVER['PHP_AUTH_PW'], $user['password'])) {
+                    $this->unauthorized();
+                }
+            }
+        }
+    }
+
+    private function unauthorized()
     {
         header('WWW-Authenticate: Basic realm="My Realm"');
         header('HTTP/1.0 401 Unauthorized');

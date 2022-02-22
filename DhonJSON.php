@@ -19,34 +19,6 @@ Class DhonJSON {
         $this->uri  = $this->dhonjson->uri;
     }
 
-    public function auth(string $db_api_name)
-    {
-        // unset($_SERVER['PHP_AUTH_USER']);
-		if (!isset($_SERVER['PHP_AUTH_USER'])) {
-			$this->unauthorized();
-		} else {
-            $db_api   = $this->load->database($db_api_name, TRUE);
-		    $user     = $db_api->get_where('api_users', ['username' => $_SERVER['PHP_AUTH_USER']])->row_array();
-			
-            if (password_verify($_SERVER['PHP_AUTH_PW'], $user['password'])) {
-                $this->response         = 'success';
-                $this->json_response 	= ['response' => $this->response, 'status' => '200'];
-            } else {
-                $this->unauthorized();
-            }
-		}
-    }
-
-    private function unauthorized()
-    {
-        header('WWW-Authenticate: Basic realm="My Realm"');
-        header('HTTP/1.0 401 Unauthorized');
-        $this->response         = 'unauthorized';
-        $this->json_response 	= ['response' => $this->response, 'status' => '401'];
-        $this->send();
-        exit;
-    }
-
     public function collect()
     {
         $this->db           = $this->load->database($this->uri->segment(1), TRUE);
@@ -56,13 +28,15 @@ Class DhonJSON {
         $this->id           = $this->uri->segment(4);
         $this->fields       = $this->db->list_fields($this->table);
 
-        if ($this->response === 'success') {
-            if ($this->uri->segment(3) == 'password_verify') $this->password_verify();
-            else if ($_GET) $this->get_where();
-            else if ($_POST) $this->post();
-            else if ($this->uri->segment(3) == 'delete') $this->delete();
-            else $this->get();
-        }
+        $response   = 'success';
+        $status     = '200';
+        $this->json_response = ['response' => $response, 'status' => $status];
+        
+        if ($this->uri->segment(3) == 'password_verify') $this->password_verify();
+        else if ($_GET) $this->get_where();
+        else if ($_POST) $this->post();
+        else if ($this->uri->segment(3) == 'delete') $this->delete();
+        else $this->get();
 
         $this->send();
     }
