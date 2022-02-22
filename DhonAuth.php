@@ -10,7 +10,7 @@ Class DhonAuth {
         $this->load = $this->dhonauth->load;
     }
 
-    public function auth(string $db_api_name)
+    public function auth(string $db_api_name, $user_from_api = [])
     {
         $db_api = $this->load->database($db_api_name, TRUE);
 
@@ -18,7 +18,7 @@ Class DhonAuth {
             if (!isset($_SERVER['PHP_AUTH_USER'])) {
                 $this->unauthorized();
             } else {
-                $user = $db_api->get_where('api_users', ['username' => $_SERVER['PHP_AUTH_USER']])->row_array();
+                $user = $user_from_api ? $user_from_api : $db_api->get_where('api_users', ['username' => $_SERVER['PHP_AUTH_USER']])->row_array();
                 
                 if (!password_verify($_SERVER['PHP_AUTH_PW'], $user['password'])) {
                     $this->unauthorized();
