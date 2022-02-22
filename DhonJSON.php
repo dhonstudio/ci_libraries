@@ -164,7 +164,7 @@ Class DhonJSON {
         $this->json_response['data'] = $result;
     }
 
-    private function send($json_response = '')
+    public function send($json_response = '')
     {
         header('Content-Type: application/json');
 		header('Access-Control-Allow-Origin: *');
