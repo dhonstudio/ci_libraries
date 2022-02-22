@@ -14,11 +14,11 @@ Class DhonMigrate {
         require_once 'DhonJSON.php';
         $this->dhonjson = new DhonJSON;
         
-        $this->dhondb =& get_instance();
+        $this->dhonmigrate =& get_instance();
 
         $this->database = $database;
-        $this->db       = $this->dhondb->load->database($database, TRUE);        
-        $this->dbforge  = $this->dhondb->load->dbforge($this->db, TRUE);
+        $this->db       = $this->dhonmigrate->load->database($database, TRUE);
+        $this->dbforge  = $this->dhonmigrate->load->dbforge($this->db, TRUE);
     }
 
     public function constraint(string $value)
@@ -77,9 +77,10 @@ Class DhonMigrate {
             if ($force == 'force') {
                 $this->dbforge->drop_table($this->table);
             } else{
-                $response   = "Failed, table {$this->table} exist";
+                $response   = "failed";
                 $status     = '304';
-                $this->dhonjson->send($response, $status);
+                $data       = ["Table `{$this->table}` exist"];
+                $this->dhonjson->send($response, $status, $data);
                 exit;
             }
         }
