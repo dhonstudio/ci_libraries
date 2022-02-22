@@ -164,12 +164,13 @@ Class DhonJSON {
         $this->json_response['data'] = $result;
     }
 
-    public function send($json_response = '')
+    public function send(string $response = '', string $status = '', $data = [])
     {
         header('Content-Type: application/json');
 		header('Access-Control-Allow-Origin: *');
-
-        $this->json_response = $json_response ? $json_response : $this->json_response;
-        echo json_encode($this->json_response, JSON_NUMERIC_CHECK);
+        
+        $json_response = $response ? ['response' => $response, 'status' => $status] : $this->json_response;
+        if (count($data) > 0) $json_response['data'] = $data;
+        echo json_encode($json_response, JSON_NUMERIC_CHECK);
     }
 }
