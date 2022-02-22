@@ -5,6 +5,9 @@ Class DhonAuth {
 	{
         require_once 'DhonJSON.php';
         $this->dhonjson = new DhonJSON;
+
+        $this->dhonauth =& get_instance();
+        $this->load = $this->dhonauth->load;
     }
 
     public function auth(string $db_api_name)
