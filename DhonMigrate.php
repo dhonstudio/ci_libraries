@@ -2,7 +2,6 @@
 
 Class DhonMigrate {
     public $version;
-    public $database;
     public $table;
     public $constraint;
     public $unique;
@@ -10,14 +9,16 @@ Class DhonMigrate {
     public $default;
     public $fields = [];
 
-    public function __construct()
+    public function __construct(string $database)
 	{
+        require_once 'DhonJSON.php';
+        $this->dhonjson = new DhonJSON;
+        
         $this->dhondb =& get_instance();
 
-        $this->dhondb->load->dbforge();
-
-        $this->dbforge  = $this->dhondb->dbforge;
-        $this->db       = $this->dhondb->load->database($this->database, TRUE);
+        $this->database = $database;
+        $this->db       = $this->dhondb->load->database($database, TRUE);        
+        $this->dbforge  = $this->dhondb->load->dbforge($this->db, TRUE);
     }
 
     public function constraint(string $value)
@@ -70,11 +71,17 @@ Class DhonMigrate {
         $this->dbforge->add_key($field_name, TRUE);
     }
 
-    public function create_table()
+    public function create_table(string $force = '')
     {
         if ($this->db->table_exists($this->table)) {
-            print_r("Failed, table {$this->table} exist");
-            exit;
+            if ($force == 'force') {
+                $this->dbforge->drop_table($this->table);
+            } else{
+                $response   = "Failed, table {$this->table} exist";
+                $status     = '304';
+                $this->dhonjson->send($response, $status);
+                exit;
+            }
         }
         $this->dbforge->add_field($this->fields);
         $this->dbforge->create_table($this->table);
@@ -94,11 +101,11 @@ Class DhonMigrate {
         $path = ENVIRONMENT == 'testing' || ENVIRONMENT == 'development' ? "\\" : "/";
         require APPPATH."migrations{$path}{$this->version}_{$classname}.php";
         $migration_name = "Migration_{$classname}";
-        $migration      = new $migration_name;
+        $migration      = new $migration_name($this->database);
 
         $this->table = 'migrations';
         $this->constraint('20')->field('version', 'BIGINT');
-        $this->create_table();
+        $this->create_table('force');
         $this->db->insert($this->table, ['version' => $this->version]);
 
         $migration->up();

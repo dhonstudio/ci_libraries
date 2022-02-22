@@ -15,5 +15,6 @@ Class DhonAuth {
         $response   = 'unauthorized';
         $status     = '401';
         $this->dhonjson->send($response, $status);
+        exit;
     }
 }
