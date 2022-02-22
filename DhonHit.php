@@ -25,7 +25,7 @@ Class DhonHit {
 	{
         $this->dhonhit =& get_instance();
 
-        require_once __DIR__ . '/../../assets/ci_libraries/DhonAPI.php';
+        require_once 'DhonAPI.php';
         $this->dhonapi = new DhonAPI;
 
         $this->load     = $this->dhonhit->load;

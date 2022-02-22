@@ -36,7 +36,7 @@ Class DhonAuth {
         }
     }
 
-    private function unauthorized()
+    public function unauthorized()
     {
         header('WWW-Authenticate: Basic realm="My Realm"');
         header('HTTP/1.0 401 Unauthorized');
