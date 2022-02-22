@@ -2,6 +2,7 @@
 
 Class DhonMigrate {
     public $version;
+    public $database;
     public $table;
     public $constraint;
     public $unique;
@@ -16,7 +17,7 @@ Class DhonMigrate {
         $this->dhondb->load->dbforge();
 
         $this->dbforge  = $this->dhondb->dbforge;
-        $this->db       = $this->dhondb->db;
+        $this->db       = $this->dhondb->load->database($this->database, TRUE);
     }
 
     public function constraint(string $value)
@@ -71,7 +72,10 @@ Class DhonMigrate {
 
     public function create_table()
     {
-        $this->db->table_exists($this->table) ? $this->dbforge->drop_table($this->table) : false;
+        if ($this->db->table_exists($this->table)) {
+            print_r("Failed, table {$this->table} exist");
+            exit;
+        }
         $this->dbforge->add_field($this->fields);
         $this->dbforge->create_table($this->table);
 
@@ -90,7 +94,7 @@ Class DhonMigrate {
         $path = ENVIRONMENT == 'testing' || ENVIRONMENT == 'development' ? "\\" : "/";
         require APPPATH."migrations{$path}{$this->version}_{$classname}.php";
         $migration_name = "Migration_{$classname}";
-        $migration      = new $migration_name();
+        $migration      = new $migration_name;
 
         $this->table = 'migrations';
         $this->constraint('20')->field('version', 'BIGINT');
