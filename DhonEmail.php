@@ -6,6 +6,7 @@ Class DhonEmail {
 	{
         $this->dhonemail =& get_instance();
 
+        $this->dhonemail->load->library('email');
         $this->email = $this->dhonemail->email;
     }
 
