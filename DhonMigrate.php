@@ -45,7 +45,7 @@ Class DhonMigrate {
         return $this;
     }
 
-    public function field(string $field_name, string $type, string $nullable = '')
+    public function field($field_name, string $type, string $nullable = '')
     {
         $field_data['type'] = $type;
 
@@ -55,9 +55,17 @@ Class DhonMigrate {
         if ($this->default !== '')      $field_data['default']          = $this->default;
         if ($nullable === 'nullable')   $field_data['null']             = TRUE;
 
-        $field_element = [
-            $field_name => $field_data
-        ];
+        if (is_array($field_name)) {
+            $field_data['name'] = $field_name[1];
+
+            $field_element = [
+                $field_name[0] => $field_data
+            ];
+        } else {
+            $field_element = [
+                $field_name => $field_data
+            ];
+        }
 
         $this->fields = array_merge($this->fields, $field_element);
         $this->constraint = '';
@@ -90,6 +98,25 @@ Class DhonMigrate {
         $this->fields = [];
     }
 
+    public function add_field()
+    {
+        $this->dbforge->add_column($this->table, $this->fields);
+
+        $this->fields = [];
+    }
+
+    public function change_field()
+    {
+        $this->dbforge->modify_column($this->table, $this->fields);
+
+        $this->fields = [];
+    }
+
+    public function drop_field(string $field)
+    {
+        $this->dbforge->drop_column($this->table, $field);
+    }
+
     public function insert(array $value)
     {
         $fields = $this->db->list_fields($this->table);
@@ -97,7 +124,7 @@ Class DhonMigrate {
         $this->db->insert($this->table, $values);
     }
 
-    public function migrate(string $classname)
+    public function migrate(string $classname, string $action = '')
     {
         $path = ENVIRONMENT == 'testing' || ENVIRONMENT == 'development' ? "\\" : "/";
         require APPPATH."migrations{$path}{$this->version}_{$classname}.php";
@@ -109,6 +136,6 @@ Class DhonMigrate {
         $this->create_table('force');
         $this->db->insert($this->table, ['version' => $this->version]);
 
-        $migration->up();
+        $action == 'change' ? $migration->change() : ($action == 'drop' ? $migration->drop() : $migration->up());
     }
 }
