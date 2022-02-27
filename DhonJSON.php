@@ -104,6 +104,7 @@ Class DhonJSON {
     private function post()
     {
         foreach ($_POST as $key => $value) {
+            $value = strpos($value, 'dansimbol') !== false ? str_replace('dansimbol', '&', $value) : $value;
             if (in_array($key, $this->fields)) $posts[$key] = $value;
 		}
         !isset($_POST[$this->fields[0]]) && in_array('stamp', $this->fields) ? $posts['stamp'] = time() : false;

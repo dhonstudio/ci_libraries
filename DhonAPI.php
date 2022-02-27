@@ -32,6 +32,7 @@ Class DhonAPI {
     public function post(string $db, string $table, array $post)
     {
         foreach ($post as $key => $value) {
+            $value = strpos($value, '&') !== false ? str_replace('&', 'dansimbol', $value) : $value;
             $posts[] = $key.'='.$value;
         }
         
