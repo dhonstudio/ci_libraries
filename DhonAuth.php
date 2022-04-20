@@ -1,20 +1,25 @@
 <?php
 
-Class DhonAuth {
+class DhonAuth
+{
     public function __construct()
-	{
+    {
         require_once 'DhonJSON.php';
         $this->dhonjson = new DhonJSON;
 
-        $this->dhonauth =& get_instance();
+        $this->dhonauth = &get_instance();
         $this->load = $this->dhonauth->load;
     }
 
     public function auth(string $db_api_name = '', $user_from_api = [])
     {
+        if (empty($_SERVER['PHP_AUTH_USER'])) {
+            $this->unauthorized();
+        }
+
         if ($db_api_name) {
             $db_api = $this->load->database($db_api_name, TRUE);
-            
+
             if ($db_api->table_exists('api_users')) {
                 $user = $db_api->get_where('api_users', ['username' => $_SERVER['PHP_AUTH_USER']])->row_array();
                 $this->authorizing($user);
@@ -29,7 +34,7 @@ Class DhonAuth {
     {
         if (!isset($_SERVER['PHP_AUTH_USER'])) {
             $this->unauthorized();
-        } else {            
+        } else {
             if (!password_verify($_SERVER['PHP_AUTH_PW'], $user['password'])) {
                 $this->unauthorized();
             }
