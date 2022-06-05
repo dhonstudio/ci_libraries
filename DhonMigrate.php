@@ -18,7 +18,7 @@ class DhonMigrate
     {
         $this->dhonmigrate = &get_instance();
 
-        require_once APPPATH . 'libraries/DhonJson.php';
+        require_once 'DhonJson.php';
         $this->dhonjson = new DhonJson;
 
         $this->database = $params['database'];
