@@ -24,6 +24,8 @@ class DhonJson
     ];
     protected $env;
     protected $db_path;
+    protected $db_exist = false;
+    protected $no_hit = true;
 
     public function __construct()
     {
@@ -93,6 +95,13 @@ class DhonJson
         $this->send(['status' => $status]);
     }
 
+    private function _check_db($database)
+    {
+        include APPPATH . "config/" . ENVIRONMENT . "/database.php";
+
+        $this->db_exist = $database ? (in_array($database . $this->env, array_keys($db)) ? true : false) : false;
+    }
+
     /**
      * Return Data/Response of Command
      *
@@ -100,7 +109,17 @@ class DhonJson
      */
     public function collect()
     {
-        if ($this->basic_auth) $this->basic_auth($this->api_db);
+        $this->_check_db($this->api_db);
+        $this->no_hit = $this->db_exist ? false : true;
+
+        if ($this->basic_auth) {
+            if ($this->db_exist == false) {
+                $status     = 404;
+                $message    = "API db name not found";
+                $this->send(['no_hit' => $this->no_hit, 'status' => $status, 'message' => $message]);
+            }
+            $this->basic_auth($this->api_db);
+        }
 
         if ($this->db_name) {
             include APPPATH . "config/{$this->db_path}/database.php";
@@ -424,7 +443,7 @@ class DhonJson
         if ($data === [false]) $this->json_response['data'] = false;
         else if ($data != '') $this->json_response['data'] = $data;
 
-        if (!$no_hit) $this->_hit();
+        if ($this->db_exist == true) if (!$no_hit) $this->_hit();
         echo json_encode($this->json_response, JSON_NUMERIC_CHECK);
         exit;
     }
