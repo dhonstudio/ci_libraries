@@ -18,7 +18,10 @@ class DhonJson
     public $sort;
     public $filter;
     public $limit;
-    protected $user;
+    protected $user = [
+        'level'     => 4,
+        'id_user'   => 1,
+    ];
     protected $env;
     protected $db_path;
 
@@ -98,10 +101,6 @@ class DhonJson
     public function collect()
     {
         if ($this->basic_auth) $this->basic_auth($this->api_db);
-        else $this->user = [
-            'level'     => 4,
-            'id_user'   => 1,
-        ];
 
         if ($this->db_name) {
             include APPPATH . "config/{$this->db_path}/database.php";
@@ -460,30 +459,34 @@ class DhonJson
             }
         }
 
-        $address_av = $this->db_hit->get_where('api_address', ['ip_address' => $ip_address])->result_array();
-        if (empty($address_av)) {
-            $this->db_hit->insert('api_address', [
-                'ip_address'    => $ip_address,
-                'ip_info'       => $this->_curl("http://ip-api.com/json/{$ip_address}")
-            ]);
-            $id_address = $this->db_hit->insert_id();
-        } else {
-            $id_address = $address_av[0]['id_address'];
+        if ($this->db_hit->table_exists('api_address')) {
+            $address_av = $this->db_hit->get_where('api_address', ['ip_address' => $ip_address])->result_array();
+            if (empty($address_av)) {
+                $this->db_hit->insert('api_address', [
+                    'ip_address'    => $ip_address,
+                    'ip_info'       => $this->_curl("http://ip-api.com/json/{$ip_address}")
+                ]);
+                $id_address = $this->db_hit->insert_id();
+            } else {
+                $id_address = $address_av[0]['id_address'];
+            }
         }
 
         //~ api_entity
         $entity = htmlentities($_SERVER['HTTP_USER_AGENT']);
 
-        $entities       = $this->db_hit->get('api_entity')->result_array();
-        $entity_key     = array_search($entity, array_column($entities, 'entity'));
-        $entity_av      = !empty($entities) ? ($entity_key > -1 ? $entities[$entity_key] : 0) : 0;
-        if ($entity_av === 0) {
-            $this->db_hit->insert('api_entity', [
-                'entity' => $entity,
-            ]);
-            $id_entity = $this->db_hit->insert_id();
-        } else {
-            $id_entity = $entity_av['id'];
+        if ($this->db_hit->table_exists('api_entity')) {
+            $entities       = $this->db_hit->get('api_entity')->result_array();
+            $entity_key     = array_search($entity, array_column($entities, 'entity'));
+            $entity_av      = !empty($entities) ? ($entity_key > -1 ? $entities[$entity_key] : 0) : 0;
+            if ($entity_av === 0) {
+                $this->db_hit->insert('api_entity', [
+                    'entity' => $entity,
+                ]);
+                $id_entity = $this->db_hit->insert_id();
+            } else {
+                $id_entity = $entity_av['id'];
+            }
         }
 
         //~ api_session
@@ -502,14 +505,16 @@ class DhonJson
             $session_value = $this->input->cookie($session_name);
         }
 
-        $session_av = $this->db_hit->get_where('api_session', ['session' => $session_value])->result_array();
-        if (empty($session_av)) {
-            $this->db_hit->insert('api_session', [
-                'session' => $session_value,
-            ]);
-            $id_session = $this->db_hit->insert_id();
-        } else {
-            $id_session = $session_av[0]['id_session'];
+        if ($this->db_hit->table_exists('api_session')) {
+            $session_av = $this->db_hit->get_where('api_session', ['session' => $session_value])->result_array();
+            if (empty($session_av)) {
+                $this->db_hit->insert('api_session', [
+                    'session' => $session_value,
+                ]);
+                $id_session = $this->db_hit->insert_id();
+            } else {
+                $id_session = $session_av[0]['id_session'];
+            }
         }
 
         //~ api_endpoint
@@ -523,14 +528,17 @@ class DhonJson
             $get = '';
         }
         $endpoint = $this->uri->uri_string() . $get;
-        $endpoint_av = $this->db_hit->get_where('api_endpoint', ['endpoint' => $endpoint])->result_array();
-        if (empty($endpoint_av)) {
-            $this->db_hit->insert('api_endpoint', [
-                'endpoint' => $endpoint,
-            ]);
-            $id_endpoint = $this->db_hit->insert_id();
-        } else {
-            $id_endpoint = $endpoint_av[0]['id_endpoint'];
+
+        if ($this->db_hit->table_exists('api_endpoint')) {
+            $endpoint_av = $this->db_hit->get_where('api_endpoint', ['endpoint' => $endpoint])->result_array();
+            if (empty($endpoint_av)) {
+                $this->db_hit->insert('api_endpoint', [
+                    'endpoint' => $endpoint,
+                ]);
+                $id_endpoint = $this->db_hit->insert_id();
+            } else {
+                $id_endpoint = $endpoint_av[0]['id_endpoint'];
+            }
         }
 
         $action = $this->method == 'GET' ? 2
@@ -543,17 +551,19 @@ class DhonJson
         $error      = $this->json_response['status'] == 200 ? 0 : $this->json_response['status'];
         $message    = isset($this->json_response['message']) ? $this->json_response['message'] : '';
 
-        $this->db_hit->insert('api_log', [
-            'id_user'       => $this->user['id_user'],
-            'address'       => $id_address,
-            'entity'        => $id_entity,
-            'session'       => $id_session,
-            'endpoint'      => $id_endpoint,
-            'action'        => $action,
-            'success'       => $success,
-            'error'         => $error,
-            'message'       => $message,
-            'created_at'    => date('Y-m-d H:i:s', time())
-        ]);
+        if ($this->db_hit->table_exists('api_log')) {
+            $this->db_hit->insert('api_log', [
+                'id_user'       => $this->user['id_user'],
+                'address'       => $id_address,
+                'entity'        => $id_entity,
+                'session'       => $id_session,
+                'endpoint'      => $id_endpoint,
+                'action'        => $action,
+                'success'       => $success,
+                'error'         => $error,
+                'message'       => $message,
+                'created_at'    => date('Y-m-d H:i:s', time())
+            ]);
+        }
     }
 }
