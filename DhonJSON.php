@@ -492,7 +492,7 @@ class DhonJson
         }
 
         //~ api_entity
-        $entity = htmlentities($_SERVER['HTTP_USER_AGENT']);
+        $entity = isset($_SERVER['HTTP_USER_AGENT']) ? htmlentities($_SERVER['HTTP_USER_AGENT']) : 'REQUEST';
 
         if ($this->db_hit->table_exists('api_entity')) {
             $entities       = $this->db_hit->get('api_entity')->result_array();
@@ -509,19 +509,23 @@ class DhonJson
         }
 
         //~ api_session
-        $this->load->helper('cookie');
-        $this->load->helper('string');
+        if (isset($_SERVER['HTTP_USER_AGENT'])) {
+            $this->load->helper('cookie');
+            $this->load->helper('string');
 
-        $session_value  = random_string('alnum', 32);
-        $session_cookie = array(
-            'name'   => $session_name,
-            'value'  => $session_value,
-            'expire' => 2 * 60 * 60,
-        );
-        if (!$this->input->cookie($session_name) || ($this->input->cookie($session_name) === '' || $this->input->cookie($session_name) === null)) {
-            set_cookie($session_cookie);
+            $session_value  = random_string('alnum', 32);
+            $session_cookie = array(
+                'name'   => $session_name,
+                'value'  => $session_value,
+                'expire' => 2 * 60 * 60,
+            );
+            if (!$this->input->cookie($session_name) || ($this->input->cookie($session_name) === '' || $this->input->cookie($session_name) === null)) {
+                set_cookie($session_cookie);
+            } else {
+                $session_value = $this->input->cookie($session_name);
+            }
         } else {
-            $session_value = $this->input->cookie($session_name);
+            $session_value = "REQUEST";
         }
 
         if ($this->db_hit->table_exists('api_session')) {
