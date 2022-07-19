@@ -36,7 +36,6 @@ class DhonJson
         $this->load         = $this->dhonjson->load;
         $this->input        = $this->dhonjson->input;
 
-        $this->env          = ENVIRONMENT == 'production' ? '' : '_dev';
         $this->db_path      = ENVIRONMENT == 'production' ? 'production' : 'testing';
     }
 
@@ -57,7 +56,7 @@ class DhonJson
                 $message    = "API db not found";
                 $this->send(['status' => $status, 'message' => $message]);
             } else {
-                $api_db = $this->load->database($api_db_name . $this->env, TRUE);
+                $api_db = $this->load->database($api_db_name, TRUE);
 
                 if ($api_db->table_exists('api_users')) {
                     if (isset($_SERVER['PHP_AUTH_USER'])) {
@@ -99,7 +98,7 @@ class DhonJson
     {
         include APPPATH . "config/" . ENVIRONMENT . "/database.php";
 
-        $this->db_exist = $database ? (in_array($database . $this->env, array_keys($db)) ? true : false) : false;
+        $this->db_exist = $database ? (in_array($database, array_keys($db)) ? true : false) : false;
     }
 
     /**
@@ -124,9 +123,9 @@ class DhonJson
         if ($this->db_name) {
             include APPPATH . "config/{$this->db_path}/database.php";
 
-            if (in_array($this->db_name . $this->env, array_keys($db))) {
-                $this->db           = $this->load->database($this->db_name . $this->env, TRUE);
-                $this->db_total     = $this->load->database($this->db_name . $this->env, TRUE);
+            if (in_array($this->db_name, array_keys($db))) {
+                $this->db           = $this->load->database($this->db_name, TRUE);
+                $this->db_total     = $this->load->database($this->db_name, TRUE);
 
                 if ($this->table) {
                     if ($this->db->table_exists($this->table)) {
@@ -461,7 +460,7 @@ class DhonJson
     {
         $session_name = 'DShC13v';
 
-        $this->db_hit = $this->load->database($this->api_db . $this->env, TRUE);
+        $this->db_hit = $this->load->database($this->api_db, TRUE);
 
         //~ api_address
         $ip_address_pre =
